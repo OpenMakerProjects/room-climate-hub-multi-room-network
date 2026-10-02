@@ -1,0 +1,21 @@
+{
+  "id": 8,
+  "title": "Room Climate Hub Multi-Room Network",
+  "repository_slug": "room-climate-hub-multi-room-network",
+  "category": "Smart Home",
+  "platform": "Raspberry Pi Zero 2 W",
+  "platform_family": "python",
+  "difficulty": "Intermediate",
+  "estimated_hours": 32,
+  "connectivity": "Local only",
+  "components": [
+    "RGB LED",
+    "light sensor",
+    "door sensor"
+  ],
+  "scope": "Build a smart home prototype that uses RGB LED, light sensor, door sensor to coordinate several wireless nodes. Include setup instructions, a circuit diagram, tested firmware, and sample output.",
+  "key_deliverable": "Multi-Room Network demonstration with repeatable test steps",
+  "mode": "telemetry",
+  "entrypoint": "src/main.py",
+  "roadmap_source": "openmaker-2100-project-roadmap.xlsx"
+}
