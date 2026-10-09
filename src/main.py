@@ -21,15 +21,36 @@ class Network:
   if len(fresh)<expected:return (1,0,0)
   if any(r['door_open'] and r['lux']<50 for r in fresh):return (0,0,1)
   return (0,1,0)
+
+# Legacy simulation API retained for downstream consumers and original regression tests.
+from dataclasses import dataclass
+@dataclass(frozen=True)
+class Snapshot:
+ timestamp:float
+ values:list
+ score:float
+ valid:bool
+class Controller:
+ def __init__(self,threshold=0.53,confirmations=2):
+  if not 0.0<=threshold<=1.0:raise ValueError('threshold must be between 0 and 1')
+  self.threshold=threshold;self.confirmations_required=max(1,confirmations)
+  self.confirmations=0;self.output_active=False
+ def evaluate(self,values,timestamp=None):
+  valid=bool(values) and all(math.isfinite(v) and 0<=v<=1 for v in values)
+  score=sum(values)/len(values) if valid else 0.0
+  self.confirmations=min(self.confirmations+1,self.confirmations_required) if valid and score>=self.threshold else 0
+  self.output_active=valid and self.confirmations>=self.confirmations_required
+  return Snapshot(time.time() if timestamp is None else timestamp,values,score,valid)
+
 class Hardware:
  def __init__(self):
   from gpiozero import RGBLED,Button
-  from smbus2 import SMBus
+  from smbus2 import SMBus,i2c_msg
   self.led=RGBLED(17,27,22,pwm=True,active_high=True)
-  self.door=Button(23,pull_up=True,bounce_time=0.05);self.bus=SMBus(1)
+  self.door=Button(23,pull_up=True,bounce_time=0.05);self.bus=SMBus(1);self.msg=i2c_msg
   self.bus.write_byte(0x23,0x10);time.sleep(0.18)
  def read(self):
-  b=self.bus.read_i2c_block_data(0x23,0x00,2)
+  m=self.msg.read(0x23,2);self.bus.i2c_rdwr(m);b=list(m)
   return not self.door.is_pressed,(b[0]*256+b[1])/1.2
  def output(self,c):self.led.color=c
  def close(self):self.led.off();self.led.close();self.door.close();self.bus.close()
