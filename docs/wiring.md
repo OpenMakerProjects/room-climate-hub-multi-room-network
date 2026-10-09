@@ -1,17 +1,2 @@
-# Wiring guide
-
-This is a low-voltage prototype wiring plan for **Room Climate Hub Multi-Room Network**. Confirm every module's datasheet because breakout-board pinouts vary.
-
-| Component | Suggested pin | Role | Check |
-| --- | --- | --- | --- |
-| RGB LED | 10 | Digital I/O | Confirm the module voltage and pinout before power-up. |
-| light sensor | A1 | Analog input | Confirm the module voltage and pinout before power-up. |
-| door sensor | A2 | Analog input | Confirm the module voltage and pinout before power-up. |
-| Status output | LED_BUILTIN | Output | Use a resistor when an external LED is fitted. |
-
-## Power
-
-- Use a regulated supply sized for the selected modules.
-- Join grounds unless an interface is explicitly isolated.
-- Do not connect mains voltage directly to a development board.
-- Add a fuse, emergency stop, and certified isolation where a real actuator can create risk.
+# Exact per-node wiring
+Pi BCM17 (physical11) -> 330 ohm -> RGB red anode; BCM27 (physical13) ->330 ohm->green; BCM22 (physical15)->330 ohm->blue; common cathode->GND physical6. Normally-closed magnetic reed contact between BCM23 physical16 and GND6; internal pull-up enabled. BH1750 3.3 V breakout VCC->3V3 physical1, SDA->BCM2 physical3, SCL->BCM3 physical5, GND->physical6, ADDR->GND (0x23). Pi powered through rated 5 V micro-USB supply. Fit identical wiring on both nodes; never connect nodes electrically across rooms.

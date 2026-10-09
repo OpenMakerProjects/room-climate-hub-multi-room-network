@@ -1,9 +1,2 @@
 # Architecture
-
-```text
-Sensors -> validation and filtering -> telemetry -> output/alert
-                                      |
-                                      +-> Local only telemetry and logs
-```
-
-The implementation separates acquisition, decision logic, output handling, and telemetry. Hardware-specific access is kept at the edge so the core behavior can be tested with simulated readings.
+Each Pi serves its own JSON sensor record at /status on LAN TCP8088. Each configured peer polls /status; network policy ignores replay records for five seconds and expires missing nodes. RGB red means missing/stale peer, blue means any fresh room door is open below 50 lux, green means no such event. Communication stays on the private WLAN; no cloud dependency or internet API.
