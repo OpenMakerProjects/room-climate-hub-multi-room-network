@@ -55,8 +55,9 @@ class Hardware:
  def output(self,c):self.led.color=c
  def close(self):self.led.off();self.led.close();self.door.close();self.bus.close()
 def main():
- p=argparse.ArgumentParser();p.add_argument('--node',required=True);p.add_argument('--peer',action='append',default=[]);p.add_argument('--port',type=int,default=8088);p.add_argument('--hardware',action='store_true');p.add_argument('--iterations',type=int,default=0)
+ p=argparse.ArgumentParser();p.add_argument('--node',default='room-a');p.add_argument('--peer',action='append',default=[]);p.add_argument('--port',type=int,default=8088);p.add_argument('--hardware',action='store_true');p.add_argument('--iterations',type=int,default=0);p.add_argument('--interval',type=float,default=1.0)
  a=p.parse_args()
+ if a.interval<0 or not math.isfinite(a.interval):p.error('--interval must be finite and nonnegative')
  for peer in a.peer:
   u=urlparse(peer)
   if u.scheme!='http' or not u.hostname or u.username or u.password or u.path not in ('','/'):raise ValueError('peer must be plain LAN http://host:port')
@@ -88,7 +89,7 @@ def main():
     except (OSError,ValueError):pass
    color=net.color(now,1+len(a.peer))
    if hardware:hardware.output(color)
-   print(json.dumps({'project_id':8,'local':record,'rgb':color}),flush=True);time.sleep(1)
+   print(json.dumps({'project_id':8,'local':record,'rgb':color}),flush=True);time.sleep(a.interval)
  finally:
   server.shutdown();server.server_close()
   if hardware:hardware.close()
